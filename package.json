@@ -1,0 +1,19 @@
+{
+  "name": "sldsjutil",
+  "version": "1.0.0",
+  "description": "常用的公共方法",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhj1214/jsTool.git"
+  },
+  "author": "zhj1214",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhj1214/jsTool/issues"
+  },
+  "homepage": "https://github.com/zhj1214/jsTool#readme"
+}
