@@ -1,5 +1,26 @@
 import Vue from "vue";
 
+// 工具类
+import { axiosGet, axiosPost } from "./lib/axios";
+import Util from "./lib/util"; // 全局注册公共方法
+import date_p from "./lib/date";
+import vTool from "./VueEvent"; // 全局注册公共Vue方法
+import ENV from "./lib/env"; // 全局通用环境配置
+import Api from "./lib/api";
+import wxConfig from "./lib/wxConfig";
+import cache from "./lib/local";
+
+//  绑定全局属性
+Vue.prototype.$ajaxGet = axiosGet;
+Vue.prototype.$ajaxPost = axiosPost;
+Vue.prototype.$API = Api;
+Vue.prototype.$Util = Util;
+Vue.prototype.$WX = wxConfig;
+
+Vue.prototype.$vTool = vTool;
+Vue.prototype.$ENV = ENV;
+Vue.prototype.$Cache = cache;
+
 const VueEvent = new Vue({
   data() {
     return {
