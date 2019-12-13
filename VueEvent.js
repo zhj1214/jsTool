@@ -4,7 +4,6 @@ import Vue from "vue";
 import { axiosGet, axiosPost } from "./lib/axios";
 import Util from "./lib/util"; // 全局注册公共方法
 import date_p from "./lib/date";
-import vTool from "./VueEvent"; // 全局注册公共Vue方法
 import ENV from "./lib/env"; // 全局通用环境配置
 import Api from "./lib/api";
 import wxConfig from "./lib/wxConfig";
@@ -16,8 +15,7 @@ Vue.prototype.$ajaxPost = axiosPost;
 Vue.prototype.$API = Api;
 Vue.prototype.$Util = Util;
 Vue.prototype.$WX = wxConfig;
-
-Vue.prototype.$vTool = vTool;
+Vue.prototype.$vTool = this;
 Vue.prototype.$ENV = ENV;
 Vue.prototype.$Cache = cache;
 
@@ -35,7 +33,19 @@ const VueEvent = new Vue({
   created() {},
   methods: {
     /**
-     * 埋点
+     * @description 追加Apis
+     */
+    addApi(apis) {
+      Vue.prototype.$API = Object.assign({}, this.$API, apis);
+    },
+    /**
+     * @description 追加 env
+     */
+    addEnv(envs) {
+      Vue.prototype.$ENV = Object.assign({}, this.$ENV, envs);
+    },
+    /**
+     * @description 埋点
      */
     sampling(type, goodsId) {
       var self = this;
@@ -93,22 +103,6 @@ const VueEvent = new Vue({
         });
     },
     /**
-     * 保存 请求记录
-     */
-    saveLocalInfo(res) {
-      this.$local.setRequestInfo({
-        params: res.config.data,
-        url: res.config.url,
-        time: this.$Util.getTimeFormat("yyyy-MM-dd HH:mm:ss"),
-        msg: res.data.message,
-        page: location.href.split("#")[1],
-        status: res.data.code
-      });
-    },
-    removeLocalInfos() {
-      this.$local.removeLocationRequestInfo();
-    },
-    /**
      * @description 广告位跳转
      */
     advertisingSwipeJump(item) {
@@ -130,7 +124,7 @@ const VueEvent = new Vue({
       }
     },
     /**
-     * 加载授权页面
+     * @description 加载授权页面
      */
     loadWXauthorizationPage(number) {
       const APPID = this.$ENV.appId;
@@ -149,30 +143,7 @@ const VueEvent = new Vue({
         encodeURIComponent(href) +
         "&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect";
     },
-    /**
-     * 获取 openId
-     */
-    getCurrentGZHopenId(code) {
-      var self = this;
-      return new Promise(function(resolve) {
-        let url = "/webchatslzt-server/api/webchat/get/openId";
-        self
-          .$ajaxGet(url, { code: code })
-          .then(res => {
-            localStorage.setItem("lastCode", code);
-            if (res.data) {
-              if (res.data.openId) {
-                localStorage.setItem("openId", res.data.openId);
-              }
-            }
-            resolve(res);
-          })
-          .catch(err => {
-            console.info(err.message);
-            rejected(err);
-          });
-      });
-    },
+
     /**
      * 用户免登陆接口 获取用户登录信息
      * */
