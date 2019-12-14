@@ -1,6 +1,6 @@
 {
   "name": "sldsjutil",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "vue项目中常用的公共方法",
   "keywords":["util","sldsj","sldsjutil"],
   "main": "VueEvent.js",

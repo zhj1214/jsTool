@@ -15,7 +15,7 @@ Vue.prototype.$ajaxPost = axiosPost;
 Vue.prototype.$API = Api;
 Vue.prototype.$Util = Util;
 Vue.prototype.$WX = wxConfig;
-Vue.prototype.$vTool = this;
+
 Vue.prototype.$ENV = ENV;
 Vue.prototype.$Cache = cache;
 
@@ -30,7 +30,9 @@ const VueEvent = new Vue({
       }
     };
   },
-  created() {},
+  created() {
+    Vue.prototype.$vTool = this;
+  },
   methods: {
     /**
      * @description 追加Apis
@@ -43,6 +45,12 @@ const VueEvent = new Vue({
      */
     addEnv(envs) {
       Vue.prototype.$ENV = Object.assign({}, this.$ENV, envs);
+    },
+    /**
+     * @description 追加 Util
+     */
+    addUtils(utils) {
+      Vue.prototype.$Util = Object.assign({}, this.$Util, utils);
     },
     /**
      * @description 埋点
@@ -127,61 +135,57 @@ const VueEvent = new Vue({
      * @description 加载授权页面
      */
     loadWXauthorizationPage(number) {
-      const APPID = this.$ENV.appId;
-      // 拼接回调地址
-      let href =
-        window.location.origin +
-        "/" +
-        window.location.hash +
-        "/?number=" +
-        number;
-      localStorage.removeItem("openId");
-      window.location.href =
-        "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" +
-        APPID +
-        "&redirect_uri=" +
-        encodeURIComponent(href) +
-        "&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect";
+      const APPID = self.$ENV.appId;
+      let href = window.location.origin + "/" + window.location.hash;
+      if (process.env.NODE_ENV === "production") {
+        localStorage.setItem("openId", "");
+        window.location.href =
+          "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" +
+          APPID +
+          "&redirect_uri=" +
+          encodeURIComponent(href) +
+          "&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect";
+      }
     },
 
     /**
-     * 用户免登陆接口 获取用户登录信息
+     * @description 免登陆需求
+     * @description 逻辑：拿到code，用code换取用户信息、用户状态
      * */
-    getMerberInfoToOpenId(code) {
-      var self = this;
-      let url = "/webchatslzt-server/api/webchat/loginByWechatCode";
-      return new Promise(function(resolve, reject) {
-        self
-          .$ajaxGet(url, { code: code })
-          .then(res => {
-            localStorage.setItem("lastCode", code);
-            if (res.code == 10000) {
+    getMemberLoginInfo(code) {
+      return new Promise((resolve, reject) => {
+        let code = this.getUrlParams("code");
+        if (code.length > 0) {
+          axios_get(API.wechat_member, {
+            code: code
+          })
+            .then(res => {
               if (res.data) {
                 if (res.data.openId) {
                   localStorage.setItem("openId", res.data.openId);
                 }
-                localStorage.orgId = res.data.orgId;
-                if (res.data.memberId) {
-                  // 免登陆情况
-                  localStorage.setItem("memberId", res.data.memberId);
-                  localStorage.setItem("uToken", res.data.uToken);
-                  localStorage.setItem("userLoginPhone", res.data.phone);
-                  resolve(res);
-                } else {
-                  // 登出 场景
-                  window.location.href = this.$ENV.baseUrl + "/#/login";
-                }
               }
-            } else {
-              // 冻杰状态
-              window.location.href = this.$ENV.baseUrl + "/#/login";
-            }
-          })
-          .catch(err => {
-            console.info(err.message);
-            rejected(err);
-          });
+              resolve(res);
+            })
+            .catch(err => {
+              reject(err);
+            });
+        } else {
+          reject("nologin");
+        }
       });
+    },
+    /**
+     * @description 会员分销员关系绑定
+     */
+    getInviteBuildRelation(distributorSysnumber) {
+      axiosPost(
+        "/distribution-server/api/distribution/toC/distributor/buildRelation",
+        {
+          distributorSysnumber: distributorSysnumber,
+          memberId: localStorage.getItem("memberId")
+        }
+      );
     }
   }
 });
