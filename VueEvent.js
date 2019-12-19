@@ -6,7 +6,7 @@ import Util from "./lib/util"; // 全局注册公共方法
 import date_p from "./lib/date";
 import ENV from "./lib/env"; // 全局通用环境配置
 import Api from "./lib/api";
-import wxConfig from "./lib/wxConfig";
+// import wxConfig from "./lib/wxConfig";
 import cache from "./lib/local";
 
 //  绑定全局属性
@@ -14,7 +14,7 @@ Vue.prototype.$ajaxGet = axiosGet;
 Vue.prototype.$ajaxPost = axiosPost;
 Vue.prototype.$API = Api;
 Vue.prototype.$Util = Util;
-Vue.prototype.$WX = wxConfig;
+// Vue.prototype.$WX = wxConfig;
 
 Vue.prototype.$ENV = ENV;
 Vue.prototype.$Cache = cache;
@@ -156,7 +156,7 @@ const VueEvent = new Vue({
       return new Promise((resolve, reject) => {
         let code = this.getUrlParams("code");
         if (code.length > 0) {
-          axios_get(API.wechat_member, {
+          axios_get(API.avoidLogin, {
             code: code
           })
             .then(res => {
@@ -179,13 +179,10 @@ const VueEvent = new Vue({
      * @description 会员分销员关系绑定
      */
     getInviteBuildRelation(distributorSysnumber) {
-      axiosPost(
-        "/distribution-server/api/distribution/toC/distributor/buildRelation",
-        {
-          distributorSysnumber: distributorSysnumber,
-          memberId: localStorage.getItem("memberId")
-        }
-      );
+      axiosPost(API.member_distribution, {
+        distributorSysnumber: distributorSysnumber,
+        memberId: localStorage.getItem("memberId")
+      });
     }
   }
 });
