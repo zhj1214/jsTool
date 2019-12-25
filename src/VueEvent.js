@@ -135,7 +135,7 @@ const VueEvent = new Vue({
      * @description 加载授权页面
      */
     loadWXauthorizationPage(number) {
-      const APPID = self.$ENV.appId;
+      const APPID = this.$ENV.appId;
       let href = window.location.origin + "/" + window.location.hash;
       if (process.env.NODE_ENV === "production") {
         localStorage.setItem("openId", "");
@@ -154,9 +154,9 @@ const VueEvent = new Vue({
      * */
     getMemberLoginInfo(code) {
       return new Promise((resolve, reject) => {
-        let code = this.getUrlParams("code");
+        let code = this.$Util.getUrlParams("code");
         if (code.length > 0) {
-          axios_get(API.avoidLogin, {
+          this.$ajaxGet(this.$API.avoidLogin, {
             code: code
           })
             .then(res => {
@@ -179,7 +179,7 @@ const VueEvent = new Vue({
      * @description 会员分销员关系绑定
      */
     getInviteBuildRelation(distributorSysnumber) {
-      axiosPost(API.member_distribution, {
+      this.$ajaxPost(this.$API.member_distribution, {
         distributorSysnumber: distributorSysnumber,
         memberId: localStorage.getItem("memberId")
       });
