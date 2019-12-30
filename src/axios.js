@@ -8,6 +8,8 @@ import axios from "axios";
 import ENV from "./env";
 import { Toast } from "vant";
 
+const self = new Vue();
+
 const axiosIns = axios.create({
   timeout: 20000, // 请求超时时间
   responseType: "json",
@@ -67,7 +69,7 @@ export const axiosGet = (url, data = {}, msg = "接口异常", headers = {}) => 
         return Promise.resolve(iRes || {});
       } else if (iRes.code === 30001 || iRes.code === 20004) {
         Toast("登录失败，请重新登录！");
-        window.location.href = ENV.loginPath;
+        window.location.href = self.$ENV.loginPath;
       } else if (iRes.code == 60000 || iRes.code == 20000) {
         Toast(iRes.message);
       } else {
@@ -90,7 +92,7 @@ export const axiosPost = (url, data = {}, msg = "接口异常", headers) => {
         return Promise.resolve(iRes);
       } else if (iRes.code === 30001 || iRes.code === 20004) {
         Toast("登录失败，请重新登录！");
-        window.location.href = ENV.loginPath;
+        window.location.href = self.$ENV.loginPath;
       } else if (iRes.code == 60000 || iRes.code == 20000) {
         Toast(iRes.message);
       } else {
